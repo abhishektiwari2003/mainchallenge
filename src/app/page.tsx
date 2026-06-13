@@ -1,101 +1,81 @@
-import Image from "next/image";
+import Link from 'next/link';
+import {
+  ArrowRight,
+  Brain,
+  HeartPulse,
+  LineChart,
+  MessageCircleHeart,
+  ShieldCheck,
+} from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { MoodOrb } from '@/components/mood-orb';
 
-export default function Home() {
+const FEATURES = [
+  {
+    icon: Brain,
+    title: 'Mirror Insights',
+    body: 'AI reads between the lines of your journal to reveal hidden triggers a 1-5 tracker would miss.',
+  },
+  {
+    icon: MessageCircleHeart,
+    title: 'Adaptive companion',
+    body: 'An empathetic, exam-aware chat that offers real-time, personalized coping strategies.',
+  },
+  {
+    icon: LineChart,
+    title: 'Burnout Radar',
+    body: 'A calm trend dashboard that flags burnout risk early — before it becomes a crisis.',
+  },
+  {
+    icon: HeartPulse,
+    title: 'Micro-mindfulness',
+    body: 'Breathing and grounding exercises that adapt to your detected distress level.',
+  },
+] as const;
+
+export default function LandingPage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <main id="main" className="container flex flex-col items-center py-16 text-center">
+      <MoodOrb size={120} mood={4} label="MindMirror companion orb" />
+      <h1 className="mt-8 max-w-3xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+        Understand the stress behind the studying.
+      </h1>
+      <p className="mt-4 max-w-2xl text-pretty text-lg text-muted-foreground">
+        MindMirror is a reflective wellbeing companion for students preparing for NEET, JEE, CUET,
+        CAT, GATE and UPSC. Journal freely — the AI surfaces the patterns you can&rsquo;t see
+        yourself.
+      </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <Link href="/onboarding" className={buttonVariants({ size: 'lg' })}>
+          Get started
+          <ArrowRight aria-hidden="true" className="h-4 w-4" />
+        </Link>
+        <Link href="/dashboard" className={buttonVariants({ size: 'lg', variant: 'outline' })}>
+          Open the app
+        </Link>
+      </div>
+
+      <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <ShieldCheck aria-hidden="true" className="h-4 w-4 text-primary" />
+        Private by design. Crisis-aware. Not a substitute for professional care.
+      </p>
+
+      <section aria-label="Features" className="mt-16 grid w-full max-w-4xl gap-4 sm:grid-cols-2">
+        {FEATURES.map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <Card key={feature.title} className="text-left">
+              <CardContent className="space-y-2 p-6">
+                <Icon aria-hidden="true" className="h-6 w-6 text-primary" />
+                <h2 className="font-semibold">{feature.title}</h2>
+                <p className="text-sm text-muted-foreground">{feature.body}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </section>
+    </main>
   );
 }

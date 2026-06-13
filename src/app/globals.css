@@ -2,26 +2,100 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Light theme (calm daylight) */
+    --background: 200 30% 98%;
+    --foreground: 215 30% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 30% 16%;
+    --primary: 175 60% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 200 35% 92%;
+    --secondary-foreground: 215 30% 20%;
+    --muted: 200 25% 94%;
+    --muted-foreground: 215 14% 42%;
+    --accent: 255 55% 92%;
+    --accent-foreground: 255 45% 30%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 30 40% 12%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 175 60% 40%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    /* Dark theme (default — eases night-study eye strain) */
+    --background: 222 32% 9%;
+    --foreground: 210 30% 92%;
+    --card: 222 28% 13%;
+    --card-foreground: 210 30% 92%;
+    --primary: 172 65% 50%;
+    --primary-foreground: 222 40% 10%;
+    --secondary: 222 22% 18%;
+    --secondary-foreground: 210 30% 90%;
+    --muted: 222 20% 17%;
+    --muted-foreground: 215 18% 65%;
+    --accent: 256 45% 24%;
+    --accent-foreground: 256 60% 88%;
+    --destructive: 0 70% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 52%;
+    --success-foreground: 222 40% 10%;
+    --warning: 38 92% 58%;
+    --warning-foreground: 30 40% 10%;
+    --border: 222 18% 24%;
+    --input: 222 18% 22%;
+    --ring: 172 65% 52%;
+    --radius: 1rem;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(60% 50% at 15% 0%, hsl(var(--primary) / 0.08), transparent),
+      radial-gradient(50% 50% at 100% 10%, hsl(var(--accent) / 0.12), transparent);
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  /* Visible, consistent focus rings for keyboard users. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* Respect users who prefer reduced motion (critical for anxious users). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
+}
+
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
