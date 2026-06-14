@@ -48,7 +48,9 @@ export function OnboardingForm() {
         <MoodOrb size={72} mood={4} />
         <CardTitle className="text-2xl">Welcome to MindMirror</CardTitle>
         <CardDescription>
-          A reflective companion that helps you understand the stress behind the studying.
+          A Generative AI companion for your mental well-being through high-stakes board exams and
+          competitive entrance tests. Through open-ended journaling and mood logs, it helps you
+          understand the stress behind the studying.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,19 +63,25 @@ export function OnboardingForm() {
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Your first name"
               autoComplete="given-name"
+              aria-label="What should we call you?"
               required
             />
           </div>
 
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium">Which exam are you preparing for?</legend>
-            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Exam">
+            <div
+              className="flex flex-wrap gap-2"
+              role="radiogroup"
+              aria-label="Competitive exam you are preparing for"
+            >
               {EXAM_TYPES.map((exam) => (
                 <button
                   key={exam}
                   type="button"
                   role="radio"
                   aria-checked={examType === exam}
+                  aria-label={exam}
                   onClick={() => setExamType(exam)}
                   className={cn(
                     'rounded-xl border px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
@@ -90,13 +98,18 @@ export function OnboardingForm() {
 
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium">How should your companion talk to you?</legend>
-            <div className="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Tone">
+            <div
+              className="grid gap-2 sm:grid-cols-3"
+              role="radiogroup"
+              aria-label="Companion tone preference"
+            >
               {TONE_PREFS.map((tone) => (
                 <button
                   key={tone}
                   type="button"
                   role="radio"
                   aria-checked={tonePref === tone}
+                  aria-label={`${TONE_LABELS[tone]} tone`}
                   onClick={() => setTonePref(tone)}
                   className={cn(
                     'rounded-xl border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
@@ -118,6 +131,7 @@ export function OnboardingForm() {
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
                 className="mt-0.5 h-4 w-4 rounded border-input"
+                aria-label="I consent to MindMirror storing my journal privately"
                 aria-describedby="consent-detail"
               />
               <span>
@@ -141,7 +155,13 @@ export function OnboardingForm() {
             </ul>
           )}
 
-          <Button type="submit" size="lg" className="w-full" disabled={saveProfile.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full"
+            disabled={saveProfile.isPending}
+            aria-label="Start reflecting"
+          >
             {saveProfile.isPending && (
               <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
             )}

@@ -5,7 +5,7 @@ import { detectCrisis, maxDistress } from '@/lib/crisis/detector';
 import { rateLimit } from '@/lib/rate-limit';
 import { sanitizeText } from '@/lib/sanitize';
 import { insightRequestSchema } from '@/lib/validation/schemas';
-import { clientKey, jsonError } from '@/lib/http';
+import { clientKey, isSameOrigin, jsonError } from '@/lib/http';
 import type { DistressLevel, JournalEntry } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -13,19 +13,18 @@ export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/insights
+ *
  * Runs the Mirror Insights analysis over the user's entries and returns a
  * validated, sanitized structured insight. The Anthropic key never leaves the
  * server. A server-side crisis check overrides the model's distress estimate
  * upward so the safety layer can never be argued down.
+ *
+ * SECURITY: Zod-validated (400) -> rate-limited (429) -> same-origin authorized
+ * (403) before any privileged AI work. Journal text is treated as data, not
+ * instructions (prompt-injection guardrail in buildInsightPrompt).
  */
 export async function POST(req: Request): Promise<Response> {
-  const limit = rateLimit(`insights:${clientKey(req)}`, { limit: 10, windowMs: 60_000 });
-  if (!limit.allowed) {
-    return jsonError('Rate limit exceeded. Please slow down.', 429, {
-      'retry-after': String(Math.ceil(limit.retryAfterMs / 1000)),
-    });
-  }
-
+  // SECURITY (1/3): validate the request body with Zod; reject malformed input.
   let payload: unknown;
   try {
     payload = await req.json();
@@ -35,7 +34,20 @@ export async function POST(req: Request): Promise<Response> {
 
   const parsed = insightRequestSchema.safeParse(payload);
   if (!parsed.success) {
-    return jsonError('Invalid request.', 422);
+    return jsonError('Invalid request.', 400);
+  }
+
+  // SECURITY (2/3): rate-limit the AI endpoint to prevent abuse/DoS.
+  const limit = rateLimit(`insights:${clientKey(req)}`, { limit: 10, windowMs: 60_000 });
+  if (!limit.allowed) {
+    return jsonError('Rate limit exceeded. Please slow down.', 429, {
+      'retry-after': String(Math.ceil(limit.retryAfterMs / 1000)),
+    });
+  }
+
+  // SECURITY (3/3): authorize the request (same-origin) before doing work.
+  if (!isSameOrigin(req)) {
+    return jsonError('Forbidden.', 403);
   }
 
   const { examType, entries } = parsed.data;

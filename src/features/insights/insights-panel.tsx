@@ -8,8 +8,9 @@ import { CrisisBanner } from '@/features/crisis/crisis-banner';
 import { useEntries, useGenerateInsight, useInsights } from '@/lib/hooks/queries';
 
 /**
- * Mirror Insights: surfaces hidden triggers and emotional patterns the student
- * can't see themselves. Leads with the "hidden trigger" reveal.
+ * Mirror Insights: a Generative AI analysis of open-ended journaling and mood
+ * logs that surfaces the hidden stress triggers and emotional patterns that
+ * standard trackers miss. Leads with the "hidden trigger" reveal.
  */
 export function InsightsPanel() {
   const { data: insights = [] } = useInsights();
@@ -27,12 +28,13 @@ export function InsightsPanel() {
               Mirror Insights
             </CardTitle>
             <CardDescription>
-              What your entries reveal that a 1-5 tracker would miss.
+              Hidden stress triggers and emotional patterns that standard trackers miss.
             </CardDescription>
           </div>
           <Button
             onClick={() => generate.mutate()}
             disabled={generate.isPending || entries.length === 0}
+            aria-label={latest ? 'Re-analyze journal for hidden patterns' : 'Analyze my journal'}
           >
             {generate.isPending ? (
               <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
@@ -68,7 +70,7 @@ export function InsightsPanel() {
           <>
             {latest.distressLevel === 'acute' && <CrisisBanner />}
 
-            <section aria-label="Hidden stress triggers">
+            <section aria-label="Hidden stress triggers" className="animate-fade-in">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <Lightbulb aria-hidden="true" className="h-4 w-4 text-warning" />
                 Hidden triggers
@@ -77,7 +79,7 @@ export function InsightsPanel() {
                 {latest.triggers.map((trigger) => (
                   <li
                     key={trigger}
-                    className="rounded-xl border border-warning/30 bg-warning/5 p-3 text-sm"
+                    className="rounded-xl border border-warning/30 bg-warning/5 p-3 text-sm transition-colors hover:bg-warning/10"
                   >
                     {trigger}
                   </li>
@@ -98,7 +100,7 @@ export function InsightsPanel() {
 
             <section
               aria-label="Suggested coping action"
-              className="rounded-xl border border-primary/30 bg-primary/5 p-4"
+              className="animate-fade-in rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10 p-4"
             >
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <Target aria-hidden="true" className="h-4 w-4 text-primary" />

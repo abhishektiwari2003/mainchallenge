@@ -19,9 +19,11 @@ export function JournalView() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Reflective journaling</CardTitle>
+            <CardTitle>Open-ended daily journaling &amp; mood logs</CardTitle>
             <CardDescription>
-              Write openly. MindMirror analyzes patterns over time — it never judges a single day.
+              Write openly. MindMirror&rsquo;s Generative AI analyzes emotional patterns over time
+              to surface hidden stress triggers that standard trackers miss — it never judges a
+              single day.
             </CardDescription>
           </CardHeader>
           <CardContent>

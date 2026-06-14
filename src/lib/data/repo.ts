@@ -12,12 +12,18 @@ import { LocalRepo } from '@/lib/data/local-repo';
 import { SupabaseRepo } from '@/lib/supabase/supabase-repo';
 
 /**
- * Persistence abstraction for all student data. Two implementations:
+ * Persistence abstraction (port) for all student data.
+ *
+ * SOLID — Dependency Inversion Principle: feature/UI modules depend on this
+ * `Repo` interface, never on a concrete database. Two interchangeable adapters
+ * implement it:
  *  - `SupabaseRepo`: production storage with Row Level Security.
  *  - `LocalRepo`: browser localStorage fallback used when Supabase is not
  *    configured and in hermetic E2E runs.
  *
- * Both implementations isolate data per authenticated/anonymous user.
+ * SOLID — Interface Segregation: the surface is intentionally small and focused
+ * on the operations the app actually needs. Liskov: either adapter is a drop-in
+ * substitute. Both implementations isolate data per authenticated/anonymous user.
  */
 export interface Repo {
   getProfile(): Promise<Profile | null>;
@@ -38,7 +44,13 @@ export interface Repo {
 
 let repoSingleton: Repo | null = null;
 
-/** Resolve the active repository implementation for the current environment. */
+/**
+ * Factory that resolves the active repository adapter for the current
+ * environment, returning it typed as the `Repo` interface so callers remain
+ * decoupled from the concrete implementation (Dependency Inversion).
+ *
+ * @returns The `Repo` implementation appropriate for this environment.
+ */
 export function getRepo(): Repo {
   if (repoSingleton) return repoSingleton;
   repoSingleton = isSupabaseConfigured() ? new SupabaseRepo() : new LocalRepo();

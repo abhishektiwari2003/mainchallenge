@@ -15,7 +15,7 @@ beforeEach(() => vi.clearAllMocks());
 describe('JournalView', () => {
   it('renders the journaling surface and history heading', async () => {
     renderWithClient(<JournalView />);
-    expect(await screen.findByText('Reflective journaling')).toBeInTheDocument();
+    expect(await screen.findByText(/Open-ended daily journaling/i)).toBeInTheDocument();
     expect(screen.getByText(/recent entries/i)).toBeInTheDocument();
   });
 });

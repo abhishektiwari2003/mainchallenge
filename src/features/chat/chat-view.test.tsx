@@ -40,6 +40,16 @@ describe('ChatView', () => {
     expect(await screen.findByText(/NEET prep is feeling/i)).toBeInTheDocument();
   });
 
+  it('exposes literal aria-labels on the send button and message input', async () => {
+    renderWithClient(<ChatView />);
+    await screen.findByText(/NEET prep is feeling/i);
+    expect(screen.getByRole('button', { name: 'Send message' })).toHaveAttribute(
+      'aria-label',
+      'Send message',
+    );
+    expect(screen.getByLabelText('Message your companion')).toBeInTheDocument();
+  });
+
   it('streams a companion reply and renders it', async () => {
     streamMock.mockImplementation(async (args: { onChunk: (t: string) => void }) => {
       args.onChunk('Take a slow breath. ');

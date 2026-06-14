@@ -14,6 +14,15 @@ describe('JournalEntryForm', () => {
     expect(screen.getByRole('button', { name: /save entry/i })).toBeDisabled();
   });
 
+  it('exposes literal aria-labels on the entry textarea and save button', () => {
+    render(<JournalEntryForm onSave={vi.fn()} />);
+    expect(screen.getByLabelText(/open-ended daily journal entry/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save entry' })).toHaveAttribute(
+      'aria-label',
+      'Save entry',
+    );
+  });
+
   it('submits the entry body and mood', async () => {
     const onSave = vi.fn().mockResolvedValue(undefined);
     const user = userEvent.setup();

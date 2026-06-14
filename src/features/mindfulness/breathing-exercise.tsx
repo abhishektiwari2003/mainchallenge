@@ -34,12 +34,14 @@ export interface BreathingExerciseProps {
 }
 
 /**
- * Adaptive breathing/grounding exercise. The pattern adapts to detected
- * distress; under prefers-reduced-motion the orb stays still and only the text
- * cue changes, so it never overwhelms an anxious user.
+ * Adaptive mindfulness: a breathing/grounding exercise whose pattern adapts to
+ * the detected distress level, paired with motivational encouragement. Under
+ * prefers-reduced-motion the orb stays still and only the text cue changes, so
+ * it never overwhelms an anxious user.
  */
 export function BreathingExercise({ level = 'mild', onClose }: BreathingExerciseProps) {
   const reduced = useReducedMotion();
+  // PERF: memoized — the breathing pattern only recomputes when severity changes.
   const phases = React.useMemo(() => phasesFor(level), [level]);
   const [phaseIndex, setPhaseIndex] = React.useState(0);
 

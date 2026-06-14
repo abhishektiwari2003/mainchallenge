@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clientKey, jsonError } from './http';
+import { clientKey, isSameOrigin, jsonError } from './http';
 
 describe('clientKey', () => {
   it('uses the first x-forwarded-for IP', () => {
@@ -14,6 +14,54 @@ describe('clientKey', () => {
 
   it('falls back to anonymous', () => {
     expect(clientKey(new Request('http://x'))).toBe('anonymous');
+  });
+});
+
+describe('isSameOrigin', () => {
+  it('allows a matching Origin host', () => {
+    const req = new Request('http://app.test/api/chat', {
+      method: 'POST',
+      headers: { host: 'app.test', origin: 'http://app.test' },
+    });
+    expect(isSameOrigin(req)).toBe(true);
+  });
+
+  it('falls back to the Referer host when Origin is absent', () => {
+    const req = new Request('http://app.test/api/chat', {
+      method: 'POST',
+      headers: { host: 'app.test', referer: 'http://app.test/journal' },
+    });
+    expect(isSameOrigin(req)).toBe(true);
+  });
+
+  it('rejects a cross-site Origin', () => {
+    const req = new Request('http://app.test/api/chat', {
+      method: 'POST',
+      headers: { host: 'app.test', origin: 'http://evil.test' },
+    });
+    expect(isSameOrigin(req)).toBe(false);
+  });
+
+  it('treats requests with no Origin/Referer as same-origin', () => {
+    const req = new Request('http://app.test/api/chat', {
+      method: 'POST',
+      headers: { host: 'app.test' },
+    });
+    expect(isSameOrigin(req)).toBe(true);
+  });
+
+  it('rejects when the host header is missing', () => {
+    const req = new Request('http://app.test/api/chat', { method: 'POST' });
+    req.headers.delete('host');
+    expect(isSameOrigin(req)).toBe(false);
+  });
+
+  it('rejects a malformed Origin value', () => {
+    const req = new Request('http://app.test/api/chat', {
+      method: 'POST',
+      headers: { host: 'app.test', origin: 'not a url' },
+    });
+    expect(isSameOrigin(req)).toBe(false);
   });
 });
 

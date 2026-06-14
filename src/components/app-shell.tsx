@@ -42,12 +42,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh">
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
         <div className="container flex h-16 items-center justify-between gap-4">
-          <Link href="/dashboard" className="flex items-center gap-2 rounded-md">
+          <Link
+            href="/dashboard"
+            aria-label="MindMirror home"
+            className="flex items-center gap-2 rounded-md"
+          >
             <MoodOrb size={32} mood={4} />
             <span className="text-lg font-semibold tracking-tight">MindMirror</span>
           </Link>
 
-          <nav aria-label="Primary" className="flex items-center gap-1">
+          <nav aria-label="Primary navigation" className="flex items-center gap-1">
             {NAV.map((item) => {
               const active = pathname === item.href;
               const Icon = item.icon;
@@ -55,6 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-label={item.label}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
                     'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
@@ -90,6 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             size="sm"
             onClick={handleDeleteAll}
             disabled={deleteAll.isPending}
+            aria-label="Delete all my data"
             className="text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
             <Trash2 aria-hidden="true" className="h-4 w-4" />

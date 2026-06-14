@@ -28,6 +28,7 @@ export function CrisisBanner() {
           <li key={line.name}>
             <a
               href={`tel:${line.dial}`}
+              aria-label={`Call ${line.name} at ${line.number}`}
               className="flex h-full flex-col gap-1 rounded-xl border border-destructive/40 bg-background/60 p-3 transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="flex items-center gap-1.5 font-medium text-foreground">

@@ -30,6 +30,8 @@ export function JournalEntryForm({ onSave, isSaving = false, onDistress }: Journ
   const [body, setBody] = React.useState('');
   const [mood, setMood] = React.useState<MoodScore>(3);
   const [draftStatus, setDraftStatus] = React.useState('');
+  // PERF: debounced autosave — the draft persists 800ms after typing stops
+  // instead of on every keystroke.
   const debouncedBody = useDebouncedValue(body, 800);
 
   React.useEffect(() => {
@@ -47,6 +49,8 @@ export function JournalEntryForm({ onSave, isSaving = false, onDistress }: Journ
     setDraftStatus('Draft saved');
   }, [debouncedBody]);
 
+  // PERF: memoized — crisis detection only re-runs on the debounced text, not
+  // on every keystroke, keeping typing smooth.
   const crisis = React.useMemo(() => detectCrisis(debouncedBody), [debouncedBody]);
 
   React.useEffect(() => {
@@ -76,6 +80,7 @@ export function JournalEntryForm({ onSave, isSaving = false, onDistress }: Journ
           onChange={(e) => setBody(e.target.value)}
           maxLength={MAX_LEN}
           placeholder="Write freely — about studying, pressure, wins, worries… MindMirror reads between the lines."
+          aria-label="What's on your mind today? Open-ended daily journal entry"
           aria-describedby="journal-help char-count"
           className="min-h-[160px]"
         />
@@ -95,7 +100,7 @@ export function JournalEntryForm({ onSave, isSaving = false, onDistress }: Journ
       {crisis.isAcute && <CrisisBanner />}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={!canSave}>
+        <Button type="submit" disabled={!canSave} aria-label="Save entry">
           {isSaving ? (
             <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
           ) : (

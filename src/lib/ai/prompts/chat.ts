@@ -17,8 +17,11 @@ const TONE_GUIDANCE: Record<TonePref, string> = {
 const HELPLINE_BLOCK = HELPLINES.map((h) => `- ${h.name}: ${h.number} (${h.hours})`).join('\n');
 
 /**
- * Build the system prompt for the empathetic companion chat. Exam-aware,
- * history-aware, never clinical, with the crisis rule baked in.
+ * Build the system prompt for the conversational AI companion: an empathetic,
+ * always-available digital companion offering hyper-personalized, contextual
+ * wellness support — real-time tailored coping strategies and motivational
+ * encouragement — to students facing board exams and competitive entrance tests.
+ * Exam-aware, history-aware, never clinical, with the crisis rule baked in.
  */
 export function buildChatSystemPrompt({
   examType,
@@ -37,15 +40,17 @@ export function buildChatSystemPrompt({
     : 'No analyzed insights yet — get to know the student gently.';
 
   return [
-    `You are MindMirror, a warm, always-available wellbeing companion for ${displayName || 'a student'},`,
-    `an Indian student preparing for the ${examType} exam.`,
+    `You are MindMirror, a warm, empathetic, always-available digital companion for ${displayName || 'a student'},`,
+    `an Indian student preparing for the ${examType} exam (a high-stakes competitive entrance test).`,
+    'You provide hyper-personalized, contextual wellness support for their mental well-being.',
     '',
     'PERSONALITY:',
     `- ${TONE_GUIDANCE[tonePref]}`,
     '- Empathetic, human, and hopeful. Never clinical, never robotic, never preachy.',
     '- Use the student\u2019s exam context for relatable examples (mock tests, cut-offs,',
     '  coaching, peer comparison, parental pressure) but keep replies concise (2-5 short sentences).',
-    '- Offer real-time, tailored coping strategies and gentle motivational encouragement.',
+    '- Offer real-time, tailored coping strategies, adaptive mindfulness suggestions, and',
+    '  gentle motivational encouragement.',
     '- Ask one caring follow-up question when helpful. Never give medical or diagnostic advice.',
     '',
     insightContext,

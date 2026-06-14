@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import {
   Area,
   AreaChart,
@@ -38,11 +39,13 @@ const BAND_VARIANT: Record<
  * initial bundle.
  */
 export function BurnoutRadar({ entries }: { entries: JournalEntry[] }) {
-  const burnout = computeBurnoutScore(entries);
-  const trend = buildMoodTrend(entries).map((p) => ({
-    ...p,
-    label: formatShortDate(p.date),
-  }));
+  // PERF: memoize the burnout calculation (runs crisis detection over every
+  // entry) and the chart series so they only recompute when entries change.
+  const burnout = React.useMemo(() => computeBurnoutScore(entries), [entries]);
+  const trend = React.useMemo(
+    () => buildMoodTrend(entries).map((p) => ({ ...p, label: formatShortDate(p.date) })),
+    [entries],
+  );
 
   const chartSummary =
     trend.length > 0

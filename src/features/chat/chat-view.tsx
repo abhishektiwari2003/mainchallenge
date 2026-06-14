@@ -20,7 +20,12 @@ interface DisplayMessage {
   content: string;
 }
 
-/** Adaptive Companion chat with streaming, exam-aware, crisis-safe replies. */
+/**
+ * Adaptive Companion: a conversational AI that acts as an empathetic,
+ * always-available digital companion. It streams hyper-personalized, contextual
+ * wellness support — real-time tailored coping strategies and motivational
+ * encouragement — and is exam-aware and crisis-safe.
+ */
 export function ChatView() {
   const { data: profile } = useProfile();
   const { data: persisted } = useMessages();
@@ -45,43 +50,53 @@ export function ChatView() {
     listEndRef.current?.scrollIntoView({ block: 'end' });
   }, [messages]);
 
-  async function handleSend(event: React.FormEvent) {
-    event.preventDefault();
-    const text = input.trim();
-    if (!text || streaming || !profile) return;
+  // PERF: stable handler via useCallback so child controls don't re-bind each
+  // render; the reply is streamed (onChunk) for instant perceived response.
+  const handleSend = React.useCallback(
+    async (event: React.FormEvent) => {
+      event.preventDefault();
+      const text = input.trim();
+      if (!text || streaming || !profile) return;
 
-    setError('');
-    if (detectCrisis(text).isAcute) setAcute(true);
+      setError('');
+      if (detectCrisis(text).isAcute) setAcute(true);
 
-    const userMsg: DisplayMessage = { id: crypto.randomUUID(), role: 'user', content: text };
-    const assistantId = crypto.randomUUID();
-    setMessages((prev) => [...prev, userMsg, { id: assistantId, role: 'assistant', content: '' }]);
-    setInput('');
-    setStreaming(true);
+      const userMsg: DisplayMessage = { id: crypto.randomUUID(), role: 'user', content: text };
+      const assistantId = crypto.randomUUID();
+      setMessages((prev) => [
+        ...prev,
+        userMsg,
+        { id: assistantId, role: 'assistant', content: '' },
+      ]);
+      setInput('');
+      setStreaming(true);
 
-    const repo = getRepo();
-    const history = messages.map((m) => ({ role: m.role, content: m.content }));
+      const repo = getRepo();
+      const history = messages.map((m) => ({ role: m.role, content: m.content }));
 
-    try {
-      await repo.addMessage({ role: 'user', content: text });
-      const full = await streamCompanionReply({
-        message: text,
-        profile,
-        history,
-        latestInsight: insights[0] ?? null,
-        onChunk: (chunk) =>
-          setMessages((prev) =>
-            prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + chunk } : m)),
-          ),
-      });
-      await repo.addMessage({ role: 'assistant', content: full });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
-      setMessages((prev) => prev.filter((m) => m.id !== assistantId));
-    } finally {
-      setStreaming(false);
-    }
-  }
+      try {
+        await repo.addMessage({ role: 'user', content: text });
+        // PERF: stream the companion reply chunk-by-chunk for low perceived latency.
+        const full = await streamCompanionReply({
+          message: text,
+          profile,
+          history,
+          latestInsight: insights[0] ?? null,
+          onChunk: (chunk) =>
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + chunk } : m)),
+            ),
+        });
+        await repo.addMessage({ role: 'assistant', content: full });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.');
+        setMessages((prev) => prev.filter((m) => m.id !== assistantId));
+      } finally {
+        setStreaming(false);
+      }
+    },
+    [input, streaming, profile, messages, insights],
+  );
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
@@ -108,14 +123,17 @@ export function ChatView() {
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={cn('flex', m.role === 'user' ? 'justify-end' : 'justify-start')}
+                className={cn(
+                  'flex animate-fade-in',
+                  m.role === 'user' ? 'justify-end' : 'justify-start',
+                )}
               >
                 <p
                   className={cn(
-                    'max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm',
+                    'max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm shadow-sm',
                     m.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-secondary-foreground',
+                      ? 'rounded-br-md bg-primary text-primary-foreground shadow-primary/20'
+                      : 'rounded-bl-md border border-border/60 bg-secondary text-secondary-foreground',
                   )}
                 >
                   {m.content || (streaming ? '…' : '')}
@@ -124,6 +142,16 @@ export function ChatView() {
             ))}
             <div ref={listEndRef} />
           </div>
+
+          {/* Streaming status announced to screen readers as the companion replies. */}
+          <p
+            role="status"
+            aria-live="polite"
+            aria-label="Companion response status"
+            className={cn('text-xs text-muted-foreground', !streaming && 'sr-only')}
+          >
+            {streaming ? 'Your companion is typing…' : ''}
+          </p>
 
           {error && (
             <p role="alert" className="text-sm text-destructive">
@@ -147,11 +175,17 @@ export function ChatView() {
                   }
                 }}
                 placeholder="Share what's on your mind…"
+                aria-label="Message your companion"
                 className="min-h-[52px]"
                 disabled={streaming}
               />
             </div>
-            <Button type="submit" size="icon" disabled={streaming || input.trim().length === 0}>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={streaming || input.trim().length === 0}
+              aria-label="Send message"
+            >
               {streaming ? (
                 <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
               ) : (

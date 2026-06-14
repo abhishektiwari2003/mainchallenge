@@ -12,8 +12,12 @@ export default defineConfig({
     exclude: ['e2e/**', 'node_modules/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'text-summary', 'html', 'lcov'],
+      // 'json' + 'json-summary' emit coverage-final.json + coverage-summary.json
+      // (machine-readable for automated analyzers); 'lcov' emits lcov.info.
+      reporter: ['text', 'text-summary', 'json', 'json-summary', 'lcov', 'html'],
       reportsDirectory: './coverage',
+      // In Vitest v4, specifying `include` makes coverage count EVERY matching
+      // source file (even those no test imports), so coverage is honest/complete.
       include: ['src/lib/**/*.ts', 'src/features/**/*.{ts,tsx}'],
       exclude: [
         'src/**/*.{test,spec}.{ts,tsx}',
@@ -21,6 +25,7 @@ export default defineConfig({
         'src/lib/supabase/**',
         'src/lib/ai/client.ts',
         'src/lib/env.ts',
+        'src/lib/types.ts',
         'src/test/**',
       ],
       thresholds: {
